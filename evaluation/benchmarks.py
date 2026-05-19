@@ -188,6 +188,12 @@ class MCQDoc:
     choices: list[str]
     gold_index: int
 
+def _choice_label_to_index(labels: list[str], answer_key: str) -> int:
+    try:
+        return labels.index(answer_key)
+    except ValueError as exc:
+        raise ValueError(f"answerKey {answer_key!r} is not present in choice labels {labels!r}") from exc
+
 def _format_mcq(doc: MCQDoc, include_gold: bool) -> tuple[str, list[str]]:
     text = doc.query.strip() + "\n"
     choices = []
@@ -295,11 +301,19 @@ class HFMCQBenchmark(StandardMCQBenchmark):
                 "gold": chr(65 + doc.gold_index)
             })
 
+def _arc_row_to_doc(row: dict[str, Any]) -> MCQDoc:
+    choices = row["choices"]
+    return MCQDoc(
+        row["question"],
+        choices["text"],
+        _choice_label_to_index(choices["label"], row["answerKey"]),
+    )
+
 class ARC(HFMCQBenchmark):
     def __init__(self, split: str = "test", subset: str = "ARC-Challenge", num_shots: int = 25):
         super().__init__(
             path="allenai/ai2_arc", name=subset, split=split, shot_split="validation", num_shots=num_shots,
-            row_to_doc_fn=lambda r: MCQDoc(r['question'], r['choices']['text'], ord(r['answerKey']) - 65)
+            row_to_doc_fn=_arc_row_to_doc
         )
 
 class HellaSwag(HFMCQBenchmark):
