@@ -71,7 +71,7 @@ class PretrainConfig(pydantic.BaseModel):
     # Resume / fine-tune from checkpoint
     resume_from: Optional[str] = None
     resume_epoch: Optional[int] = None
-    weights_only_resume: bool = False  # Skip optimizer (fresh LR schedule + EMA)
+    weights_only_resume_from_ema: bool = False  # Swap EMA into model + reset optim
 
     # Extras
     seed: int = 0
@@ -227,9 +227,10 @@ def reduce_metrics(local_metrics: dict[str, Tensor], prefix: str):
 def load_checkpoint(config: PretrainConfig, train_state: TrainState):
     """Resume from a saved checkpoint.
 
-    By default loads both model weights and optimizer state (which carries EMA
-    in AdamATan2). Set weights_only_resume=True to load only model weights —
-    typical for SFT where a fresh LR schedule and EMA buffer are desired.
+    Loads both model weights and optimizer state (which carries EMA in
+    AdamATan2). When weights_only_resume_from_ema=True, swaps the EMA buffer
+    into the model and resets the optimizer state — typical for fine-tuning
+    off a pretrain run with EMA-smoothed weights.
     """
     if config.resume_from is None:
         return
@@ -242,17 +243,19 @@ def load_checkpoint(config: PretrainConfig, train_state: TrainState):
         epoch = max(int(Path(f).stem.split("_")[-1]) for f in ckpt_files)
 
     checkpoint_id = os.path.join(config.resume_from, f"fsdp2_epoch_{epoch}")
-    if config.weights_only_resume:
-        print(f"[Resume] Loading model weights only from {checkpoint_id}")
-        dcp.load({"model": train_state.model.state_dict()}, checkpoint_id=checkpoint_id)
-    else:
-        print(f"[Resume] Loading model + optimizer from {checkpoint_id}")
-        optim_state = get_optimizer_state_dict(train_state.model, train_state.optim)
-        dcp.load(
-            {"model": train_state.model.state_dict(), "optim": optim_state},
-            checkpoint_id=checkpoint_id,
-        )
-        set_optimizer_state_dict(train_state.model, train_state.optim, optim_state)
+    print(f"[Resume] Loading model + optimizer from {checkpoint_id}")
+    optim_state = get_optimizer_state_dict(train_state.model, train_state.optim)
+    dcp.load(
+        {"model": train_state.model.state_dict(), "optim": optim_state},
+        checkpoint_id=checkpoint_id,
+    )
+    set_optimizer_state_dict(train_state.model, train_state.optim, optim_state)
+
+    if config.weights_only_resume_from_ema:
+        print("[Resume] Swapping EMA into model and resetting optimizer state")
+        train_state.optim.swap_ema()
+        train_state.optim._init_state()
+
     print(f"[Resume] Done.")
 
 

@@ -190,7 +190,7 @@ torchrun --nproc_per_node=8 pretrain.py \
   +checkpoint_path=/path/to/sft_out
 ```
 
-`resume_from` loads both model weights and optimizer state (including EMA) by default. Add `weights_only_resume=true` to load weights only and start LR schedule + EMA fresh. The `arch/*` flags must match the pretrain checkpoint's `all_config.yaml` (override `arch.n_layers` etc. if it differs from the size preset).
+`resume_from` loads both model weights and optimizer state (including EMA) by default. Add `weights_only_resume_from_ema=true` to swap the pretrain EMA buffer into the model and start with a fresh optimizer — typical when fine-tuning off a pretrain run. The `arch/*` flags must match the pretrain checkpoint's `all_config.yaml` (override `arch.n_layers` etc. if it differs from the size preset).
 
 ## Status
 
