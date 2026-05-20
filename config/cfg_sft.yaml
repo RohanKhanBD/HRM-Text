@@ -12,6 +12,7 @@ hydra:
 #   data.path=/path/to/prepared_sft_data
 #   +checkpoint_path=/path/to/sft_out
 resume_from: ???
+weights_only_resume: false   # Set true to skip optimizer (fresh LR + EMA)
 
 global_batch_size: 4096
 epochs: 10
