@@ -253,7 +253,7 @@ For model-quality changes, we evaluate whether the change improves the Pareto fr
 
 The full paper is available here:
 
-[📄 View PDF](assets/HRM_Text.pdf)
+[📄 View PDF](https://sapientinc.github.io/HRM-Text/assets/HRM_Text.pdf)
 
 ## Citation
 
