@@ -1,0 +1,28 @@
+defaults:
+  - arch/net@arch: hrm
+  - arch/size@arch: XL
+  - data: sft
+  - _self_
+
+hydra:
+  output_subdir: null
+
+# REQUIRED — set via CLI override:
+#   resume_from=/path/to/pretrain_ckpt
+#   data.path=/path/to/prepared_sft_data
+#   +checkpoint_path=/path/to/sft_out
+resume_from: ???
+
+global_batch_size: 4096
+epochs: 10
+checkpoint_interval: 5
+
+lr: 2.0e-5
+lr_min_ratio: 0.1
+lr_warmup_steps: 50
+
+weight_decay: 0.1
+beta1: 0.9
+beta2: 0.95
+
+ema: 0.9999

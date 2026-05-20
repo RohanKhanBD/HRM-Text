@@ -1,6 +1,7 @@
 from typing import Optional
 from dataclasses import dataclass
 from pathlib import Path
+from glob import glob
 import math
 import os
 import yaml
@@ -66,6 +67,10 @@ class PretrainConfig(pydantic.BaseModel):
     project_name: Optional[str] = None
     run_name: Optional[str] = None
     checkpoint_path: Optional[str] = None
+
+    # Resume / fine-tune from checkpoint (model weights only, optimizer state is fresh)
+    resume_from: Optional[str] = None
+    resume_epoch: Optional[int] = None
 
     # Extras
     seed: int = 0
@@ -218,6 +223,24 @@ def reduce_metrics(local_metrics: dict[str, Tensor], prefix: str):
     return {prefix + name: metrics[idx] for idx, name in enumerate(metric_keys)}
 
 
+def load_checkpoint(config: PretrainConfig, train_state: TrainState):
+    """Load pretrained checkpoint for fine-tuning (model weights only, no optimizer)."""
+    if config.resume_from is None:
+        return
+
+    epoch = config.resume_epoch
+    if epoch is None:
+        ckpt_files = glob(os.path.join(config.resume_from, "fsdp2_epoch_*"))
+        if not ckpt_files:
+            raise FileNotFoundError(f"No checkpoint found in {config.resume_from}")
+        epoch = max(int(Path(f).stem.split("_")[-1]) for f in ckpt_files)
+
+    checkpoint_id = os.path.join(config.resume_from, f"fsdp2_epoch_{epoch}")
+    print(f"[Resume] Loading model from {checkpoint_id}")
+    dcp.load({"model": train_state.model.state_dict()}, checkpoint_id=checkpoint_id)
+    print(f"[Resume] Done.")
+
+
 def save_code_and_config(config: PretrainConfig, train_metadata: V1DatasetMeta):
     if config.checkpoint_path is None or wandb.run is None:
         return
@@ -288,6 +311,7 @@ def launch(hydra_config: DictConfig):
 
     # --- Training
     train_state, train_loader, train_metadata = init_train(config, rank=RANK, world_size=WORLD_SIZE)
+    load_checkpoint(config, train_state)
 
     # Progress bar and logger
     progress_bar = None
