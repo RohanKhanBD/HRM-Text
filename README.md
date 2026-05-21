@@ -3,7 +3,7 @@
 # HRM-Text: Efficient Pretraining Beyond Scaling
 
 <p align="center">
-  <a href="https://sapientinc.github.io/HRM-Text/assets/HRM_Text.pdf"><img src="https://img.shields.io/badge/Paper-PDF-red" alt="Paper"></a>
+  <a href="https://arxiv.org/pdf/2605.20613"><img src="https://img.shields.io/badge/Paper-arXiv-red?logo=arxiv&logoColor=white" alt="arXiv Paper"></a>
   <a href="https://huggingface.co/sapientinc/HRM-Text-1B"><img src="https://img.shields.io/badge/Model-HuggingFace-yellow" alt="Model"></a>
 </p>
 
@@ -248,15 +248,21 @@ For infrastructure changes intended to be behavior-preserving, include before/af
 
 For model-quality changes, we evaluate whether the change improves the Pareto frontier of training compute versus performance. Strict improvements and high-ROI changes are good candidates for defaults; valuable tradeoffs with higher cost or lower performance may belong in separate configs.
 
-## Paper
-
-The full paper is available here:
-
-[📄 View PDF](https://sapientinc.github.io/HRM-Text/assets/HRM_Text.pdf)
-
 ## Citation
 
-Citation information will be added with the accompanying paper.
+If you find this project or our paper useful, please consider citing our paper:
+
+```
+@misc{wang2026hrmtextefficientpretrainingscaling,
+      title={HRM-Text: Efficient Pretraining Beyond Scaling}, 
+      author={Guan Wang and Changling Liu and Chenyu Wang and Cai Zhou and Yuhao Sun and Yifei Wu and Shuai Zhen and Luca Scimeca and Yasin Abbasi Yadkori},
+      year={2026},
+      eprint={2605.20613},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2605.20613}, 
+}
+```
 
 ## License
 
