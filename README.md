@@ -11,6 +11,8 @@
 
 HRM-Text is a 1B text generation model based on the HRM architecture, strengthened by task completion and latent space reasoning. It offers a full pretraining framework, making foundation model pretraining accessible with 130-600x less compute and 150-900x less data. It is built upon a hierarchical recurrent architecture, PrefixLM sequence packing, FlashAttention 3 kernels, PyTorch FSDP2 training, evaluation, and checkpoint conversion tooling.
 
+**Join 1200+ HRM Developers on Our Discord Community: [https://discord.gg/sapient](https://discord.gg/sapient)**
+
 ![](./assets/benchmark_scatter.png)
 
 ## Launch the Pretraining 🚀
