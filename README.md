@@ -286,6 +286,12 @@ For infrastructure changes intended to be behavior-preserving, include before/af
 
 For model-quality changes, we evaluate whether the change improves the Pareto frontier of training compute versus performance. Strict improvements and high-ROI changes are good candidates for defaults; valuable tradeoffs with higher cost or lower performance may belong in separate configs.
 
+Community-contributed architecture explorations are merged onto separate experimental branches rather than `main`:
+
+- [`experimental/moe-64x8`](https://github.com/sapientinc/HRM-Text/tree/experimental/moe-64x8) — sparse MoE (64×8), contributed by XiaoYee · [community checkpoint](https://huggingface.co/Xiaoye08/HRM-MoE)
+
+
+
 ## Citation
 
 If you find this project or our paper useful, please consider citing our paper:
